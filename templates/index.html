@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video to Audio Converter</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Convert Video to Audio</h1>
+        <form id="uploadForm">
+            <input type="file" id="videoFile" name="video" accept="video/*" required>
+            <button type="submit">Convert</button>
+        </form>
+
+        <!-- Result Message -->
+        <div id="result" class="hidden">
+            <p>Conversion successful! Download your audio below:</p>
+            <a id="downloadLink" href="#" download>Download Audio</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const formData = new FormData();
+            const fileInput = document.getElementById('videoFile');
+            formData.append('video', fileInput.files[0]);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('result').classList.remove('hidden');
+                    document.getElementById('downloadLink').href = data.audioUrl;
+                } else {
+                    alert(data.error || 'Something went wrong.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during conversion.');
+            }
+        });
+    </script>
+</body>
+</html>
